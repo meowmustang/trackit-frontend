@@ -1,5 +1,5 @@
 export async function refreshToken(): Promise<string> {
-  const res = await fetch('${import.meta.env.VITE_API_BASE_URL}/api/auth/refresh', {
+  const res = await fetch('${API_BASE_URL}/api/auth/refresh', {
     method: 'POST',
     credentials: 'include',
   });

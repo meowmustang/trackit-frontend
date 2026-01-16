@@ -25,7 +25,7 @@ export default function Scan() {
         const token = localStorage.getItem("trackit_token")
         if (!token) throw new Error()
 
-        const res = await fetch('${import.meta.env.VITE_API_BASE_URL}/api/labour/me', {
+        const res = await fetch('${API_BASE_URL}/api/labour/me', {
           headers: { Authorization: `Bearer ${token}` },
         })
 
@@ -116,7 +116,7 @@ useEffect(() => {
       const token = localStorage.getItem("trackit_token")
       if (!token) throw new Error()
 
-      const res = await fetch('${import.meta.env.VITE_API_BASE_URL}/api/labour/scan', {
+      const res = await fetch('${API_BASE_URL}/api/labour/scan', {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -8,7 +8,7 @@ export async function syncOfflineEvents() {
   for (const e of events) {
     try {
       const res = await authFetch(
-        '${import.meta.env.VITE_API_BASE_URL}/api/labour/events',
+        '${API_BASE_URL}/api/labour/events',
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

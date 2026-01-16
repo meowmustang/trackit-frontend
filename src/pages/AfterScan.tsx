@@ -52,7 +52,7 @@ export default function AfterScan() {
         const token = localStorage.getItem("trackit_token")
         if (!token) return
 
-        const res = await fetch('${import.meta.env.VITE_API_BASE_URL}/api/labour/me', {
+        const res = await fetch('${API_BASE_URL}/api/labour/me', {
           headers: { Authorization: `Bearer ${token}` },
         })
 
@@ -109,7 +109,7 @@ export default function AfterScan() {
 
   try {
       const res = await fetch(
-  '${import.meta.env.VITE_API_BASE_URL}/api/labour/events',
+  '${API_BASE_URL}/api/labour/events',
   {
     method: "POST",
     headers: {
@@ -202,7 +202,7 @@ setLastAction((prev) => ({
       }
 
       const res = await fetch(
-        '${import.meta.env.VITE_API_BASE_URL}/api/labour/events',
+        '${API_BASE_URL}/api/labour/events',
         {
           method: "POST",
           headers: {
