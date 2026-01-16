@@ -69,7 +69,7 @@ if (phone.length !== 10) {
       formData.append("photo", compressedPhoto)
 
       const res = await fetch(
-        "${import.meta.env.VITE_API_BASE_URL}/api/labour/auth/signup",
+        '${import.meta.env.VITE_API_BASE_URL}/api/labour/auth/signup',
         {
           method: "POST",
           body: formData,
