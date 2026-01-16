@@ -30,8 +30,7 @@ export default function AfterScan() {
     nextRoom: string
   } | null>(null)
 
-  const [pendingAction, setPendingAction] =
-    useState<"check_in" | null>(null)
+
 
   const [profile, setProfile] = useState<WorkerProfile | null>(null)
   const [popupMessage, setPopupMessage] = useState<string | null>(null)
@@ -53,7 +52,7 @@ export default function AfterScan() {
         const token = localStorage.getItem("trackit_token")
         if (!token) return
 
-        const res = await fetch("http://localhost:3000/api/labour/me", {
+        const res = await fetch("${import.meta.env.VITE_API_BASE_URL}/api/labour/me", {
           headers: { Authorization: `Bearer ${token}` },
         })
 
@@ -110,7 +109,7 @@ export default function AfterScan() {
 
   try {
       const res = await fetch(
-  "http://localhost:3000/api/labour/events",
+  "${import.meta.env.VITE_API_BASE_URL}/api/labour/events",
   {
     method: "POST",
     headers: {
@@ -133,7 +132,6 @@ if (!res.ok && data?.code === "CONFIRM_ROOM_SWITCH") {
     currentRoom: data.current_room,
     nextRoom: data.next_room,
   })
-  setPendingAction("check_in")
   return
 }
 
@@ -187,11 +185,6 @@ setLastAction((prev) => ({
    
   }
 
-  const openGateConfirm = (action: "gate_in" | "gate_out") => {
-    setGateAction(action)
-    setShowGateModal(true)
-  }
-
   const sendGateEvent = async () => {
     if (!room) return
 
@@ -209,7 +202,7 @@ setLastAction((prev) => ({
       }
 
       const res = await fetch(
-        "http://localhost:3000/api/labour/events",
+        "${import.meta.env.VITE_API_BASE_URL}/api/labour/events",
         {
           method: "POST",
           headers: {
@@ -250,11 +243,9 @@ setLastAction((prev) => ({
     onConfirm={() => {
       setConfirmSwitch(null)
       sendRoomEvent("check_in", true)
-      setPendingAction(null)
     }}
     onCancel={() => {
       setConfirmSwitch(null)
-      setPendingAction(null)
     }}
   />
 )}
