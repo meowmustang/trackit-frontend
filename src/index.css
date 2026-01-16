@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+/* 🔥 Tailwind v4 theme tokens */
+@theme {
+  --color-brand: #ff914d;
+}
