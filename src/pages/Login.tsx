@@ -25,7 +25,7 @@ export default function Login() {
     try {
       setLoading(true);
 
-      const res = await fetch(`${API_BASE_URL}/labour/auth/login`, {
+      const res = await fetch(`${API_BASE_URL}/api/labour/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
