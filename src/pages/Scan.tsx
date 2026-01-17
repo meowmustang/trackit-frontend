@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react"
 import { BrowserMultiFormatReader } from "@zxing/browser"
 import type { IScannerControls } from "@zxing/browser"
 import { useNavigate } from "react-router-dom"
+import { API_BASE_URL } from "../config/api"
 
 import GreetingCard from "../components/ui/home/GreetingCard"
 import type { WorkerProfile } from "../types/worker"
@@ -25,7 +26,7 @@ export default function Scan() {
         const token = localStorage.getItem("trackit_token")
         if (!token) throw new Error()
 
-        const res = await fetch('${API_BASE_URL}/api/labour/me', {
+        const res = await fetch(`${API_BASE_URL}/api/labour/me`, {
           headers: { Authorization: `Bearer ${token}` },
         })
 
@@ -116,7 +117,7 @@ useEffect(() => {
       const token = localStorage.getItem("trackit_token")
       if (!token) throw new Error()
 
-      const res = await fetch('${API_BASE_URL}/api/labour/scan', {
+      const res = await fetch(`${API_BASE_URL}/api/labour/scan`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

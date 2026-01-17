@@ -1,5 +1,6 @@
 import { getQueuedEvents, removeEvent, markEventFailed } from "./offlineQueue"
 import { authFetch } from "../auth/authFetch"
+import { API_BASE_URL } from "../config/api"
 
 export async function syncOfflineEvents() {
   const events = await getQueuedEvents()
@@ -8,7 +9,7 @@ export async function syncOfflineEvents() {
   for (const e of events) {
     try {
       const res = await authFetch(
-        '${API_BASE_URL}/api/labour/events',
+        `${API_BASE_URL}/api/labour/events`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

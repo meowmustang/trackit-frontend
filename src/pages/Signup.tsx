@@ -4,6 +4,7 @@ import NotchedInput from "../components/ui/auth/NotchedInput"
 import PrimaryButton from "../components/ui/auth/PrimaryButton"
 import AuthResultModal from "../components/ui/popup/AuthResultModal"
 import { compressImage } from "../assets/photocomp/PhotoComp"
+import { API_BASE_URL } from "../config/api"
 
 const VENDORS = [
   { id: 1, name: "Multiflex" },
@@ -69,7 +70,7 @@ if (phone.length !== 10) {
       formData.append("photo", compressedPhoto)
 
       const res = await fetch(
-        '${API_BASE_URL}/api/labour/auth/signup',
+        `${API_BASE_URL}/api/labour/auth/signup`,
         {
           method: "POST",
           body: formData,

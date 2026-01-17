@@ -1,7 +1,8 @@
 import axios from "axios"
+import { API_BASE_URL } from "../config/api"
 
 const api = axios.create({
-  baseURL: '${API_BASE_URL}api',
+  baseURL: `${API_BASE_URL}/api`,
   withCredentials: true, // IMPORTANT for refresh cookie
 })
 
@@ -23,7 +24,7 @@ api.interceptors.response.use(
       try {
         // Call refresh endpoint
         const res = await axios.post(
-          `${import.meta.env.VITE_API_BASE_URL}/api/auth/refresh`,
+          `${API_BASE_URL}/api/auth/refresh`,
           {},
           { withCredentials: true }
         )

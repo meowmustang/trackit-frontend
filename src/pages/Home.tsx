@@ -6,6 +6,7 @@ import type { TodayActivity } from "../types/activity"
 import { authFetch } from "../auth/authFetch"
 import { syncOfflineEvents } from "../services/syncOfflineEvents"
 import { useOnlineStatus } from "../services/useOnlineStatus"
+import { API_BASE_URL } from "../config/api"
 
 export default function Home() {
   const [profile, setProfile] = useState<WorkerProfile | null>(null)
@@ -21,7 +22,7 @@ export default function Home() {
         if (!token) throw new Error("No token found")
 
 
-        const res = await authFetch('${API_BASE_URL}/api/labour/me')
+        const res = await authFetch(`${API_BASE_URL}/api/labour/me`)
 
         if (!res.ok) throw new Error("Unauthorized")
 
@@ -50,7 +51,7 @@ export default function Home() {
       const token = localStorage.getItem("trackit_token")
       if (!token) return
 
-      const res = await authFetch('${API_BASE_URL}/api/labour/activity/today')
+      const res = await authFetch(`${API_BASE_URL}/api/labour/activity/today`)
 
       if (!res.ok) throw new Error("Failed to load activity")
 

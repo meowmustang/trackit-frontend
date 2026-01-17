@@ -10,6 +10,7 @@ import GateConfirmModal from "../components/ui/scan/GateConfirmModal"
 import RoomSwitchConfirmModal from "../components/ui/scan/RoomSwitchConfirmModal"
 import { queueEvent } from "../services/offlineQueue"
 import { useOnlineStatus } from "../services/useOnlineStatus"
+import { API_BASE_URL } from "../config/api"
 
 type ScanRoom = {
   type: "gate" | "room"
@@ -52,7 +53,7 @@ export default function AfterScan() {
         const token = localStorage.getItem("trackit_token")
         if (!token) return
 
-        const res = await fetch('${API_BASE_URL}/api/labour/me', {
+        const res = await fetch(`${API_BASE_URL}/api/labour/me`, {
           headers: { Authorization: `Bearer ${token}` },
         })
 
@@ -109,7 +110,7 @@ export default function AfterScan() {
 
   try {
       const res = await fetch(
-  '${API_BASE_URL}/api/labour/events',
+  `${API_BASE_URL}/api/labour/events`,
   {
     method: "POST",
     headers: {
@@ -202,7 +203,7 @@ setLastAction((prev) => ({
       }
 
       const res = await fetch(
-        '${API_BASE_URL}/api/labour/events',
+        `${API_BASE_URL}/api/labour/events`,
         {
           method: "POST",
           headers: {
