@@ -17,12 +17,19 @@ const VENDORS = [
   { id: 8, name: "Bluestar" },
 ]
 
+const ROLES = [
+  { value: "SUPERVISOR", label: "Supervisor" },
+  { value: "TECHNICIAN", label: "Technician" },
+  { value: "HELPER", label: "Helper" },
+]
+
 export default function Signup() {
   const navigate = useNavigate()
 
   const [name, setName] = useState("")
   const [phone, setPhone] = useState("")
   const [vendorId, setVendorId] = useState<number | "">("")
+  const [role, setRole] = useState<string>("")
   const [photo, setPhoto] = useState<File | null>(null)
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -46,7 +53,7 @@ export default function Signup() {
   /* ---------------- SIGNUP HANDLER ---------------- */
 
   const handleSignup = async () => {
-   if (!name || !phone || !vendorId || !photo) {
+   if (!name || !phone || !vendorId || !role || !photo) {
   setError("All fields are required")
   return
 }
@@ -67,6 +74,7 @@ if (phone.length !== 10) {
       formData.append("worker_name", name)
       formData.append("phone_number", phone)
       formData.append("vendor_id", vendorId.toString())
+      formData.append("role", role)
       formData.append("photo", compressedPhoto)
 
       const res = await fetch(
@@ -144,6 +152,26 @@ if (phone.length !== 10) {
                 {VENDORS.map(v => (
                   <option key={v.id} value={v.id}>
                     {v.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Role */}
+            <div className="relative">
+              <label className="absolute -top-2 left-4 bg-white px-1 text-sm text-gray-700">
+                Role
+              </label>
+
+              <select
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                className="w-full h-14 rounded-xl border border-orange-400 px-4"
+              >
+                <option value="">Select Role</option>
+                {ROLES.map(r => (
+                  <option key={r.value} value={r.value}>
+                    {r.label}
                   </option>
                 ))}
               </select>
