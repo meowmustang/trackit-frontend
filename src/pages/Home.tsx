@@ -13,6 +13,39 @@ export default function Home() {
   const [loading, setLoading] = useState(true)
   const [activities, setActivities] = useState<TodayActivity[]>([])
   const isOnline = useOnlineStatus()
+  const [insideBuilding, setInsideBuilding] = useState<boolean>(false)
+  const [activeRoom, setActiveRoom] = useState<string | null>(null)
+
+
+  const fetchWorkerState = async () => {
+  const res = await authFetch("/api/worker/current-state")
+  const data = await res.json()
+
+  setInsideBuilding(data.inside_building)
+  setActiveRoom(data.active_room_id)
+}
+
+useEffect(() => {
+  fetchWorkerState()
+}, [])
+
+
+
+  const InsideBuildingBadge = ({ inside }: { inside: boolean }) => {
+  return (
+    <div
+      className={`px-3 py-1 rounded-full text-xs font-semibold ${
+        inside
+          ? "bg-green-100 text-green-700"
+          : "bg-red-100 text-red-700"
+      }`}
+    >
+      {inside ? "🟢 Inside Building" : "🔴 Outside Building"}
+    </div>
+  )
+}
+
+
 
   useEffect(() => {
     
@@ -71,6 +104,15 @@ export default function Home() {
 
   return (  
     <>
+
+      <InsideBuildingBadge inside={insideBuilding} />
+  
+        {insideBuilding && activeRoom && (
+      <div className="text-xs text-gray-500 mt-1">
+        Current area: {activeRoom}
+      </div>
+    )}
+
       <GreetingCard profile={profile} />
       <ActivityList activities={activities} />
       {!isOnline && (

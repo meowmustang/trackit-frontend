@@ -11,6 +11,7 @@ import RoomSwitchConfirmModal from "../components/ui/scan/RoomSwitchConfirmModal
 import { queueEvent } from "../services/offlineQueue"
 import { useOnlineStatus } from "../services/useOnlineStatus"
 import { API_BASE_URL } from "../config/api"
+import { authFetch } from "../auth/authFetch"
 
 type ScanRoom = {
   type: "gate" | "room"
@@ -25,6 +26,8 @@ export default function AfterScan() {
   const { state } = useLocation()
   const room = state as ScanRoom | null
   const isOnline = useOnlineStatus()
+  const [insideBuilding, setInsideBuilding] = useState<boolean>(false)
+  const [activeRoom, setActiveRoom] = useState<string | null>(null)
 
   const [confirmSwitch, setConfirmSwitch] = useState<{
     currentRoom: string
@@ -46,6 +49,35 @@ export default function AfterScan() {
     useState<{ check_in?: string; check_out?: string }>({})
 
   const isGate = room?.type === "gate"
+
+      const fetchWorkerState = async () => {
+      const res = await authFetch("/api/worker/current-state")
+      const data = await res.json()
+
+      setInsideBuilding(data.inside_building)
+      setActiveRoom(data.active_room_id)
+    }
+
+
+    const InsideBuildingBadge = ({ inside }: { inside: boolean }) => {
+      return (
+        <div
+          className={`px-3 py-1 rounded-full text-xs font-semibold ${
+            inside
+              ? "bg-green-100 text-green-700"
+              : "bg-red-100 text-red-700"
+          }`}
+        >
+          {inside ? "🟢 Inside Building" : "🔴 Outside Building"}
+        </div>
+      )
+    }
+
+
+useEffect(() => {
+  fetchWorkerState()
+}, [])
+
 
   useEffect(() => {
     const fetchMe = async () => {
@@ -258,6 +290,14 @@ setLastAction((prev) => ({
           onCancel={() => setShowGateModal(false)}
         />
       )}
+
+        <InsideBuildingBadge inside={insideBuilding} />
+  
+        {insideBuilding && activeRoom && (
+      <div className="text-xs text-gray-500 mt-1">
+        Current area: {activeRoom}
+      </div>
+    )}
 
       <div className="flex flex-col h-full space-y-4 p-4">
         {profile && <GreetingCard profile={profile} />}
