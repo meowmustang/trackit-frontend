@@ -1,18 +1,24 @@
 export const auth = {
   setToken(token: string) {
-    localStorage.setItem("trackit_token", token);
+    localStorage.setItem("access_token", token);
   },
 
-  getToken() {
-    return localStorage.getItem("trackit_token");
+  getAccessToken() {
+    return localStorage.getItem("access_token");
+  },
+
+  getRefreshToken() {
+    return localStorage.getItem("refresh_token");
   },
 
   isLoggedIn() {
-    return !!localStorage.getItem("trackit_token");
+    return !!localStorage.getItem("access_token");
   },
 
   logout() {
-    localStorage.removeItem("trackit_token");
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
     localStorage.removeItem("trackit_name");
+    window.location.href = "/login";
   },
 };

@@ -4,37 +4,40 @@ let isRefreshing = false;
 let refreshPromise: Promise<string> | null = null;
 
 function forceLogout() {
-  localStorage.removeItem('trackit_token');
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('refresh_token');
   window.location.href = '/login';
 }
-
 
 export async function authFetch(
   input: RequestInfo,
   init: RequestInit = {},
 ): Promise<Response> {
-  const token = localStorage.getItem('trackit_token');
+  const accessToken = localStorage.getItem('access_token');
 
   const res = await fetch(input, {
     ...init,
     headers: {
       ...(init.headers || {}),
-      Authorization: token ? `Bearer ${token}` : '',
+      ...(accessToken
+        ? { Authorization: `Bearer ${accessToken}` }
+        : {}),
     },
-    credentials: 'include', // REQUIRED for refresh cookie
+    credentials: 'include',
   });
 
+  // ✅ Token still valid
   if (res.status !== 401) return res;
 
-  // 🔁 Silent refresh
+  // 🔁 Silent refresh (single flight)
   if (!isRefreshing) {
     isRefreshing = true;
     refreshPromise = refreshToken();
   }
 
   try {
-    const newToken = await refreshPromise!;
-    localStorage.setItem('trackit_token', newToken);
+    const newAccessToken = await refreshPromise!;
+    localStorage.setItem('access_token', newAccessToken);
   } catch {
     forceLogout();
     throw new Error('Session expired');
@@ -42,13 +45,12 @@ export async function authFetch(
     isRefreshing = false;
   }
 
-  
-  // 🔁 Retry original request
+  // 🔁 Retry original request with new token
   return fetch(input, {
     ...init,
     headers: {
       ...(init.headers || {}),
-      Authorization: `Bearer ${localStorage.getItem('trackit_token')}`,
+      Authorization: `Bearer ${localStorage.getItem('access_token')}`,
     },
     credentials: 'include',
   });

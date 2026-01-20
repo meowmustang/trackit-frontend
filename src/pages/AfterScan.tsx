@@ -27,7 +27,6 @@ export default function AfterScan() {
   const room = state as ScanRoom | null
   const isOnline = useOnlineStatus()
   const [insideBuilding, setInsideBuilding] = useState<boolean>(false)
-  const [activeRoom, setActiveRoom] = useState<string | null>(null)
 
   const [confirmSwitch, setConfirmSwitch] = useState<{
     currentRoom: string
@@ -50,34 +49,20 @@ export default function AfterScan() {
 
   const isGate = room?.type === "gate"
 
-      const fetchWorkerState = async () => {
-      const res = await authFetch("/api/worker/current-state")
-      const data = await res.json()
-
-      setInsideBuilding(data.inside_building)
-      setActiveRoom(data.active_room_id)
+    useEffect(() => {
+    const loadState = async () => {
+      try {
+        const res = await authFetch(`${API_BASE_URL}/api/worker/current-state`,{cache: 'no-store'})
+       if (!res.ok) throw new Error("Failed to fetch worker state")
+        const data = await res.json()
+        setInsideBuilding(data.inside_building)
+      } catch (err) {
+        console.error("Failed to load worker state", err)
+      }
     }
-
-
-    const InsideBuildingBadge = ({ inside }: { inside: boolean }) => {
-      return (
-        <div
-          className={`px-3 py-1 rounded-full text-xs font-semibold ${
-            inside
-              ? "bg-green-100 text-green-700"
-              : "bg-red-100 text-red-700"
-          }`}
-        >
-          {inside ? "🟢 Inside Building" : "🔴 Outside Building"}
-        </div>
-      )
-    }
-
-
-useEffect(() => {
-  fetchWorkerState()
-}, [])
-
+    
+    loadState()
+  }, [])
 
   useEffect(() => {
     const fetchMe = async () => {
@@ -291,11 +276,15 @@ setLastAction((prev) => ({
         />
       )}
 
-        <InsideBuildingBadge inside={insideBuilding} />
-  
-        {insideBuilding && activeRoom && (
-      <div className="text-xs text-gray-500 mt-1">
-        Current area: {activeRoom}
+        {insideBuilding !== null && (
+      <div
+        className={`text-sm px-3 py-1 rounded-full ${
+          insideBuilding
+            ? "bg-green-100 text-green-700"
+            : "bg-red-100 text-red-700"
+        }`}
+      >
+        {insideBuilding ? "🟢 Inside Building" : "🔴 Outside Building"}
       </div>
     )}
 
