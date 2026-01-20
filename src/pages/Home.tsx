@@ -16,7 +16,6 @@ export default function Home() {
   const [insideBuilding, setInsideBuilding] = useState<boolean>(false)
 
 
-  useEffect(() => {
     const loadState = async () => {
       try {
         const res = await authFetch(`${API_BASE_URL}/api/worker/current-state`,{cache: 'no-store'})
@@ -29,8 +28,7 @@ export default function Home() {
     }
     
     loadState()
-  }, [])
-
+    
   useEffect(() => {
     
     const fetchMe = async () => {
