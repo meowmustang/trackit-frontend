@@ -39,9 +39,8 @@ export default function Login() {
         const data = await res.json();
 
         // ✅ store ONLY the JWT
-        localStorage.setItem("access_token", data.access_token)
-        localStorage.setItem("refresh_token", data.refresh_token)
-
+        localStorage.setItem("trackit_token", data.access_token)
+        
         navigate("/home", { replace: true });
         return;
       }
