@@ -249,85 +249,94 @@ const sendGateEvent = async () => {
   if (!room) return <div className="p-4">Invalid scan</div>
 
   return (
-    <>
-     {confirmSwitch && (
-  <RoomSwitchConfirmModal
-    currentRoom={confirmSwitch.currentRoom}
-    nextRoom={confirmSwitch.nextRoom}
-    onConfirm={() => {
-      setConfirmSwitch(null)
-      sendRoomEvent("check_in", true)
-    }}
-    onCancel={() => {
-      setConfirmSwitch(null)
-    }}
-  />
-)}
+  <>
+    {/* ---------- ROOM SWITCH CONFIRM ---------- */}
+    {confirmSwitch && (
+      <RoomSwitchConfirmModal
+        currentRoom={confirmSwitch.currentRoom}
+        nextRoom={confirmSwitch.nextRoom}
+        onConfirm={() => {
+          setConfirmSwitch(null)
+          sendRoomEvent("check_in", true)
+        }}
+        onCancel={() => {
+          setConfirmSwitch(null)
+        }}
+      />
+    )}
 
-      {showGateModal && (
-        <GateConfirmModal
-          mode={gateAction === "gate_in" ? "in" : "out"}
-          onConfirm={sendGateEvent}
-          onCancel={() => setShowGateModal(false)}
+    {/* ---------- GATE CONFIRM (only if NO popup) ---------- */}
+    {showGateModal && !popupMessage && !confirmSwitch && (
+      <GateConfirmModal
+        mode={gateAction === "gate_in" ? "in" : "out"}
+        onConfirm={() => {
+          // 🔥 CRITICAL FIX: close modal FIRST
+          setShowGateModal(false)
+          sendGateEvent()
+        }}
+        onCancel={() => setShowGateModal(false)}
+      />
+    )}
+
+    <div className="flex flex-col h-full space-y-4 p-4">
+      {profile && <GreetingCard profile={profile} />}
+
+      <RoomSummary
+        roomNumber={room.room_number}
+        floor={room.floor}
+      />
+
+      <CheckActionCard
+        roomNumber={room.room_number}
+        onCheckIn={() => {
+          if (isGate) {
+            // 🧹 clear any stale popup before opening gate modal
+            setPopupMessage(null)
+            setGateAction("gate_in")
+            setShowGateModal(true)
+          } else {
+            sendRoomEvent("check_in")
+          }
+        }}
+        onCheckOut={() => {
+          if (isGate) {
+            setPopupMessage(null)
+            setGateAction("gate_out")
+            setShowGateModal(true)
+          } else {
+            sendRoomEvent("check_out")
+          }
+        }}
+        checkInLabel={isGate ? "Gate In" : "Check-in"}
+        checkOutLabel={isGate ? "Gate Out" : "Check-out"}
+      />
+
+      <LastScannedRoom
+        roomNumber={room.room_number}
+        floor={room.floor}
+        checkIn={lastAction.check_in}
+        checkOut={lastAction.check_out}
+      />
+
+      {/* ---------- COMMON POPUP ---------- */}
+      {!confirmSwitch && popupMessage && (
+        <Popup
+          open={true}
+          message={popupMessage}
+          type={popupType}
+          onClose={() => {
+            setPopupMessage(null)
+            setPopupType("error")
+          }}
         />
       )}
 
-      <div className="flex flex-col h-full space-y-4 p-4">
-        {profile && <GreetingCard profile={profile} />}
-
-        <RoomSummary
-          roomNumber={room.room_number}
-          floor={room.floor}
-        />
-
-        <CheckActionCard
-            roomNumber={room.room_number}
-            onCheckIn={() => {
-              if (isGate) {
-                setGateAction("gate_in")
-                setShowGateModal(true)
-              } else {
-                sendRoomEvent("check_in")
-              }
-            }}
-            onCheckOut={() => {
-              if (isGate) {
-                setGateAction("gate_out")
-                setShowGateModal(true)
-              } else {
-                sendRoomEvent("check_out")
-              }
-            }}
-            checkInLabel={isGate ? "Gate In" : "Check-in"}
-            checkOutLabel={isGate ? "Gate Out" : "Check-out"}
-          />
-
-
-        <LastScannedRoom
-          roomNumber={room.room_number}
-          floor={room.floor}
-          checkIn={lastAction.check_in}
-          checkOut={lastAction.check_out}
-        />
-
-        {!confirmSwitch && popupMessage && (
-            <Popup
-              open={true}
-              message={popupMessage}
-              type={popupType}
-              onClose={() => {
-                setPopupMessage(null)
-                setPopupType("error")
-              }}
-            />
-
-          )}
-          {!isOnline && (
-            <div className="bg-yellow-100 text-yellow-800 text-sm p-2 text-center">
-              Offline mode — actions will sync automatically
-            </div>
-          )}
-      </div>
-    </>
-  )
+      {!isOnline && (
+        <div className="bg-yellow-100 text-yellow-800 text-sm p-2 text-center">
+          Offline mode — actions will sync automatically
+        </div>
+      )}
+    </div>
+  </>
+)
 }
