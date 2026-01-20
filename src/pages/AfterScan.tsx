@@ -25,6 +25,7 @@ export default function AfterScan() {
   const { state } = useLocation()
   const room = state as ScanRoom | null
   const isOnline = useOnlineStatus()
+  const [isInsideGate, setIsInsideGate] = useState<boolean | null>(null)
 
   const [confirmSwitch, setConfirmSwitch] = useState<{
     currentRoom: string
@@ -186,45 +187,64 @@ setLastAction((prev) => ({
    
   }
 
-  const sendGateEvent = async () => {
-    if (!room) return
+const sendGateEvent = async () => {
+  if (!room) return
 
-    try {
-      const token = localStorage.getItem("trackit_token")
-      if (!token) return
-
-      const payload = {
-        client_event_id: crypto.randomUUID(),
-        room_id: room.room_id,
-        room_no: room.room_number,
-        floor_no: room.floor,
-        action: gateAction,
-        event_time: new Date().toISOString(),
-      }
-
-      const res = await fetch(
-        `${API_BASE_URL}/api/labour/events`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(payload),
-        }
-      )
-
-      if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.message)
-      }
-
-      setShowGateModal(false)
-      setTimeout(() => navigate("/home"), 1200)
-    } catch (err: any) {
-      setPopupMessage(err.message)
-    }
+  // 🚫 prevent double gate-in
+  if (gateAction === "gate_in" && isInsideGate === true) {
+    setPopupType("error")
+    setPopupMessage("Already inside building")
+    return
   }
+
+  try {
+    const token = localStorage.getItem("trackit_token")
+    if (!token) return
+
+    const payload = {
+      client_event_id: crypto.randomUUID(),
+      room_id: room.room_id,
+      room_no: room.room_number,
+      floor_no: room.floor,
+      action: gateAction,
+      event_time: new Date().toISOString(),
+    }
+
+    const res = await fetch(`${API_BASE_URL}/api/labour/events`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    })
+
+    const data = await res.json()
+
+    if (!res.ok) {
+      setPopupType("error")
+      setPopupMessage(data.message || "Action not allowed")
+      return
+    }
+
+    // ✅ SUCCESS
+    setPopupType("success")
+    setPopupMessage(
+      gateAction === "gate_in"
+        ? "You are now inside the building"
+        : "You have exited the building"
+    )
+
+    setIsInsideGate(gateAction === "gate_in")
+    setShowGateModal(false)
+
+    // optional redirect
+    setTimeout(() => navigate("/home"), 1200)
+  } catch {
+    setPopupType("error")
+    setPopupMessage("Network error. Try again.")
+  }
+}
 
   if (!room) return <div className="p-4">Invalid scan</div>
 
@@ -295,8 +315,12 @@ setLastAction((prev) => ({
               open={true}
               message={popupMessage}
               type={popupType}
-              onClose={() => setPopupMessage(null)}
+              onClose={() => {
+                setPopupMessage(null)
+                setPopupType("error")
+              }}
             />
+
           )}
           {!isOnline && (
             <div className="bg-yellow-100 text-yellow-800 text-sm p-2 text-center">
