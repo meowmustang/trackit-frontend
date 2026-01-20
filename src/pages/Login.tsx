@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { auth } from "../auth/auth";
 import { API_BASE_URL } from "../config/api";
 
 import NotchedInput from "../components/ui/auth/NotchedInput";
@@ -39,8 +38,8 @@ export default function Login() {
         const data = await res.json();
 
         // ✅ store ONLY the JWT
-        localStorage.setItem("trackit_token", data.access_token)
-        
+        localStorage.setItem("access_token", data.access_token)
+
         navigate("/home", { replace: true });
         return;
       }
