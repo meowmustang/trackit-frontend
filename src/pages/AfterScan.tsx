@@ -219,13 +219,6 @@ setLastAction((prev) => ({
         throw new Error(err.message)
       }
 
-      setPopupType("success")
-      setPopupMessage(
-        gateAction === "gate_in"
-          ? "Gate in successful"
-          : "Gate out successful"
-      )
-
       setShowGateModal(false)
       setTimeout(() => navigate("/home"), 1200)
     } catch (err: any) {
