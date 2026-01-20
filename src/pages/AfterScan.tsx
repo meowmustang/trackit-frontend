@@ -11,7 +11,6 @@ import RoomSwitchConfirmModal from "../components/ui/scan/RoomSwitchConfirmModal
 import { queueEvent } from "../services/offlineQueue"
 import { useOnlineStatus } from "../services/useOnlineStatus"
 import { API_BASE_URL } from "../config/api"
-import { authFetch } from "../auth/authFetch"
 
 type ScanRoom = {
   type: "gate" | "room"
@@ -26,7 +25,6 @@ export default function AfterScan() {
   const { state } = useLocation()
   const room = state as ScanRoom | null
   const isOnline = useOnlineStatus()
-  const [insideBuilding, setInsideBuilding] = useState<boolean>(false)
 
   const [confirmSwitch, setConfirmSwitch] = useState<{
     currentRoom: string
@@ -48,21 +46,6 @@ export default function AfterScan() {
     useState<{ check_in?: string; check_out?: string }>({})
 
   const isGate = room?.type === "gate"
-
-    useEffect(() => {
-    const loadState = async () => {
-      try {
-        const res = await authFetch(`${API_BASE_URL}/api/worker/current-state`,{cache: 'no-store'})
-       if (!res.ok) throw new Error("Failed to fetch worker state")
-        const data = await res.json()
-        setInsideBuilding(data.inside_building)
-      } catch (err) {
-        console.error("Failed to load worker state", err)
-      }
-    }
-    
-    loadState()
-  }, [])
 
   useEffect(() => {
     const fetchMe = async () => {
@@ -275,18 +258,6 @@ setLastAction((prev) => ({
           onCancel={() => setShowGateModal(false)}
         />
       )}
-
-        {insideBuilding !== null && (
-      <div
-        className={`text-sm px-3 py-1 rounded-full ${
-          insideBuilding
-            ? "bg-green-100 text-green-700"
-            : "bg-red-100 text-red-700"
-        }`}
-      >
-        {insideBuilding ? "🟢 Inside Building" : "🔴 Outside Building"}
-      </div>
-    )}
 
       <div className="flex flex-col h-full space-y-4 p-4">
         {profile && <GreetingCard profile={profile} />}

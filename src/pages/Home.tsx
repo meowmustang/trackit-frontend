@@ -13,22 +13,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true)
   const [activities, setActivities] = useState<TodayActivity[]>([])
   const isOnline = useOnlineStatus()
-  const [insideBuilding, setInsideBuilding] = useState<boolean>(false)
 
-
-    const loadState = async () => {
-      try {
-        const res = await authFetch(`${API_BASE_URL}/api/worker/current-state`,{cache: 'no-store'})
-       if (!res.ok) throw new Error("Failed to fetch worker state")
-        const data = await res.json()
-        setInsideBuilding(data.inside_building)
-      } catch (err) {
-        console.error("Failed to load worker state", err)
-      }
-    }
-    
-    loadState()
-    
   useEffect(() => {
     
     const fetchMe = async () => {
@@ -86,19 +71,6 @@ export default function Home() {
 
   return (  
     <>
-
-     {insideBuilding !== null && (
-      <div
-        className={`text-sm px-3 py-1 rounded-full ${
-          insideBuilding
-            ? "bg-green-100 text-green-700"
-            : "bg-red-100 text-red-700"
-        }`}
-      >
-        {insideBuilding ? "🟢 Inside Building" : "🔴 Outside Building"}
-      </div>
-    )}
-
       <GreetingCard profile={profile} />
       <ActivityList activities={activities} />
       {!isOnline && (
